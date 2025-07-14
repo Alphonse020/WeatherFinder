@@ -1,0 +1,77 @@
+<div class="weather-app">
+  <!-- Header -->
+  <header class="app-header">
+    <h1><fa-icon [icon]="icons.weather"></fa-icon> WeatherFinder</h1>
+    <p class="subtitle">Get real-time weather updates</p>
+  </header>
+
+  <!-- Search Box -->
+  <div class="search-container">
+    <div class="search-box">
+      <input 
+        type="text" 
+        [(ngModel)]="city" 
+        placeholder="Enter city/town name (e.g. Nairobi, Kampala)"
+        (keyup.enter)="getWeather()"
+        [disabled]="isLoading"
+      >
+      <button (click)="getWeather()" [disabled]="isLoading">
+        <fa-icon [icon]="icons.search"></fa-icon> 
+        {{ isLoading ? 'Searching...' : 'Search' }}
+      </button>
+    </div>
+    <div *ngIf="errorMessage" class="error-message">
+      ⚠️ {{ errorMessage }}
+    </div>
+  </div>
+  
+   <!-- Weather Display -->
+  <div *ngIf="weather" class="weather-card" @fadeIn>
+    <div class="weather-main">
+      <h2>{{ weather.city }}</h2>
+      <div class="temperature">
+        <fa-icon [icon]="icons.temp"></fa-icon>
+        <span>{{ weather.temperature }}°C</span>
+      </div>
+      <p class="description">{{ weather.description | titlecase }}</p>
+    </div>
+    <div *ngIf="lastUpdated" class="last-updated">
+      Last updated: {{ lastUpdated | date:'mediumTime' }}
+    </div>
+  </div>
+
+   <!-- History Section -->
+  <div *ngIf="logs.length" class="history-section">
+    <h3><fa-icon [icon]="icons.history"></fa-icon> Recent Searches</h3>
+    <div class="history-grid">
+      <div *ngFor="let log of logs" class="history-item">
+        <div class="history-city">{{ log.city }}</div>
+        <div class="history-temp">{{ log.temperature }}°C</div>
+        <div class="history-desc">{{ log.description | titlecase }}</div>
+        <div class="history-date">{{ log.requestDate | date:'short' }}</div>
+         <button 
+          class="delete-btn" 
+          (click)="deleteLog(log)"
+          [disabled]="deletingIds.has(log.id)"
+          [attr.aria-label]="'Delete record for ' + log.city"
+        >
+          <fa-icon 
+            [icon]="deletingIds.has(log.id) ? icons.spinner : icons.trash" 
+            [spin]="deletingIds.has(log.id)"
+          ></fa-icon>
+        </button>
+        
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+   <!-- Enhanced Error Display -->
+  <div *ngIf="errorMessage" class="error-message" @fadeInOut>
+    <fa-icon [icon]="icons.warning"></fa-icon>
+    <span>{{ errorMessage }}</span>
+  </div>
+</div>
